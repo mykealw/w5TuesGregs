@@ -16,6 +16,7 @@ export class HousesController extends BaseController {
   async getAll(req, res, next) {
     try {
       const houses = await housesService.getAll()
+      res.send(houses)
     } catch (error) {
       next(error)
     }
@@ -32,7 +33,9 @@ export class HousesController extends BaseController {
 
   async create(req, res, next) {
     try {
+      req.body.creatorId = req.userInfo.id
       const house = await housesService.create(req.body)
+      res.send(house)
     } catch (error) {
       next(error)
     }
@@ -40,7 +43,7 @@ export class HousesController extends BaseController {
 
   async edit(req, res, next) {
     try {
-      req.body.id = req.params._id
+      req.body.id = req.params.id
       req.body.creatorId = req.userInfo.id
       const house = await housesService.edit(req.body)
       res.send(house)
