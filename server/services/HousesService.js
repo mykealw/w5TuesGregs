@@ -14,15 +14,31 @@ class HousesService {
   }
 
   async create(body) {
-    throw new Error('Method not implemented.')
+    const house = await dbContext.Houses.create(body)
+    await house.populate('creator', 'picture name')
+    return house
   }
 
-  async edit(body) {
-    throw new Error('Method not implemented.')
+  async edit(update) {
+    const original = await this.getbyId(update.id)
+    if (original.creatorId.toString() !== update.creatorId) { throw new Forbidden('invalid access') }
+    original.bedrooms = update.bedrooms || original.bedrooms
+    original.bathrooms = update.bathrooms || original.bathrooms
+    original.levels = update.levels || original.levels
+    original.imgUrl = update.imgUrl || original.imgUrl
+    original.year = update.year || original.year
+    original.price = update.price || original.price
+    original.description = update.description || original.description
+    await original.save()
+    return original
   }
 
   async remove(id, userId) {
-    throw new Error('Method not implemented.')
+    const car = await this.getbyId(id)
+    if (car.creatorId.toString() !== userId) {
+      throw new Forbidden('thats not yours to delete')
+    }
+    await dbContext.Houses.findByIdAndDelete(id)
   }
 }
 
